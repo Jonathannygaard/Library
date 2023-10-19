@@ -3,12 +3,17 @@
 #include <list>
 
 
+class Edge_Node;
+class Graph_Node;
 std::vector<int> Vector;
 
-
+class Sorting
+{
+public:
+    
 /// \brief Sorting vector using bubblesort
 /// \param v Vector to be sorted
-void bubblesort(std::vector <int> v)
+static void bubblesort(std::vector <int> v)
 {
     
     bool swapped;
@@ -33,7 +38,7 @@ void bubblesort(std::vector <int> v)
 /// \param v Vector to be sorted
 /// \param x First element
 /// \param y Second element
-void swap(std::vector<int>& v, int x, int y)
+static void swap(std::vector<int>& v, int x, int y)
 {
     int temp = v[x];
     v[x] = v[y];
@@ -44,7 +49,7 @@ void swap(std::vector<int>& v, int x, int y)
 /// \param vec Vector to be sorted
 /// \param L Left most index (0)
 /// \param R Right most index (size - 1)
-void quicksort(std::vector<int> &vec, int L, int R)
+static void quicksort(std::vector<int> &vec, int L, int R)
 {
     int i, j, mid, piv;
     i = L;
@@ -78,7 +83,7 @@ void quicksort(std::vector<int> &vec, int L, int R)
 /// \param L Left most index
 /// \param M Middle index
 /// \param R Right most index
-void merge(std::vector<int>& vec, int L, int M, int R)
+static void merge(std::vector<int>& vec, int L, int M, int R)
 {
     int i, j, k;
     int n1 = M - L + 1;
@@ -125,7 +130,7 @@ void merge(std::vector<int>& vec, int L, int M, int R)
 /// \param vec Vector to be sorted
 /// \param L Left most index (0)
 /// \param R Right most index (size - 1)
-void merge_sort(std::vector<int>& vec, int L, int R)
+static void merge_sort(std::vector<int>& vec, int L, int R)
 {
     if (L < R) {
         int M = (L + R) / 2;
@@ -134,6 +139,8 @@ void merge_sort(std::vector<int>& vec, int L, int R)
         merge(vec, L, M, R);
     }
 }
+};
+
 
 /// \brief Printing vector
 /// \param v Vector to be printed
@@ -173,6 +180,7 @@ int get_sum_of(B_Tree_Node* root)
     return root->data + get_sum_of(root->left) + get_sum_of(root->right);
 }
 
+
 /// \brief Standard tree node class
 class Standard_Tree_Node
 {
@@ -180,80 +188,148 @@ public:
     int data;
     //std::list<Standard_Tree_Node*>children;
     std::vector<Standard_Tree_Node*> children;
+    Standard_Tree_Node* Parent;
 };
 
-/// \brief Create new standard tree node
-/// \param data Data of the node
-Standard_Tree_Node* new_standard_tree_node(int data)
+class Standard_Tree
 {
-    Standard_Tree_Node* node = new Standard_Tree_Node();
-    node->data = data;
-    return node;
-}
-
-/// \brief Get sum of standard tree
-/// \param root Root of the tree
-int get_sum_of_standard_tree(Standard_Tree_Node* root)
-{
-    if(root == NULL)
-        return 0;
-
-    int sum = root->data;
-    for(int i = 0; i < root->children.size(); i++)
+public:
+    /// \brief Create new standard tree node
+    /// \param data Data of the node
+   static Standard_Tree_Node* new_standard_tree_node(int data, Standard_Tree_Node* Parent)
     {
-        sum += get_sum_of_standard_tree(root->children.front());
-        root->children.push_back(root->children.front());
-        root->children.erase(root->children.begin());
+        Standard_Tree_Node* node = new Standard_Tree_Node();
+        node->data = data;
+        node->Parent = Parent;
+        return node;
     }
-    return sum;
-}
 
-void print_standard_tree(Standard_Tree_Node* root)
-{
-    if(root == NULL)
-        return;
-
-    std::cout<<root->data<<std::endl;
-    for(int i = 0; i < root->children.size(); i++)
+    /// \brief Get sum of standard tree
+    /// \param root Root of the tree
+   static int get_sum_of_standard_tree(Standard_Tree_Node* root)
     {
-        print_standard_tree(root->children.front());
-        root->children.push_back(root->children.front());
-        root->children.erase(root->children.begin());
+        if(root == NULL)
+            return 0;
+
+        int sum = root->data;
+        for(int i = 0; i < root->children.size(); i++)
+        {
+            sum += get_sum_of_standard_tree(root->children.front());
+            root->children.push_back(root->children.front());
+            root->children.erase(root->children.begin());
+        }
+        return sum;
     }
-}
 
-int main()
+
+    /// \brief Print standard tree
+    /// \param root node used as root in print
+    static void print_standard_tree(Standard_Tree_Node* root)
+    {
+        if(root == NULL)
+            return;
+
+        std::cout<<root->data<<std::endl;
+        for(int i = 0; i < root->children.size(); i++)
+        {
+            print_standard_tree(root->children.front());
+            root->children.push_back(root->children.front());
+            root->children.erase(root->children.begin());
+        }
+    }
+
+    /// \brief Find parent of node
+    /// \param node Node to find parent of
+    static void find_parent(Standard_Tree_Node* node)
+   {
+       if(node->Parent == NULL)
+       {
+           std::cout<<"Node is root"<<std::endl;
+           return;
+       }
+       std::cout<<node->Parent->data<<std::endl;
+   }
+
+    static void find_children(Standard_Tree_Node* node)
+   {
+       if (node->children.size() == 0)
+       {
+           std::cout<<"Node has no children"<<std::endl;
+           return;
+       }
+       for (Standard_Tree_Node* i: node->children)
+       {
+           std::cout<<"Printing data from all children"<<std::endl;
+           std::cout<<i->data<<std::endl;
+       }
+   }
+    
+};
+
+
+class Graph_Node
 {
+public:
+    int data;
+    std::vector<Edge_Node*> Edges; 
+};
+class Edge_Node
+{
+public:
+    int data;
+    std::vector<Graph_Node*> Nodes;
+};
 
-    // B_Tree_Node* root = new_B_Tree_Node(1);
-    // root->left = new_B_Tree_Node(2);
-    // root->right = new_B_Tree_Node(3);
-    // root->left->left  = new_B_Tree_Node(15);
-    // root->left->right = new_B_Tree_Node(25);
-    // root->left = new_B_Tree_Node(7);
-    //
-    // std::cout<<root->left->data<<std::endl;
-    // std::cout<<get_sum_of(root->left) <<std::endl;
-    //
-    Standard_Tree_Node* root = new_standard_tree_node(1);
+class Graph
+{
+public:
+   static Graph_Node* new_graph_node(int data, std::vector<Edge_Node*> Edges)
+    {
+        Graph_Node* node = new Graph_Node();
+        node->data = data;
+        node->Edges = Edges;
+        return node;
+    }
+    static Edge_Node* new_edge_node(int data, std::vector<Graph_Node*> Nodes)
+    {
+        Edge_Node* node = new Edge_Node();
+        node->data = data;
+        node->Nodes = Nodes;
+        return node;
+    }
+    static void add_connection(Graph_Node* Node, Edge_Node* Edge)
+    {
+        Node->Edges.push_back(Edge);
+        Edge->Nodes.push_back(Node);
+    }
+    static void remove_connection(Graph_Node* Node, Edge_Node* Edge)
+    {
+        for(int i = 0; i < Node->Edges.size(); i++)
+        {
+            if(Node->Edges[i] == Edge)
+            {
+                Node->Edges.erase(Node->Edges.begin() + i);
+            }
+        }
+        for(int i = 0; i < Edge->Nodes.size(); i++)
+        {
+            if(Edge->Nodes[i] == Node)
+            {
+                Edge->Nodes.erase(Edge->Nodes.begin() + i);
+            }
+        }
+    }
+    static void print_graph(Graph_Node* Node)
+    {
+        std::cout<<Node->data<<std::endl;
+        for(int i = 0; i < Node->Edges.size(); i++)
+        {
+            std::cout<<Node->Edges[i]->data<<std::endl;
+            for(int j = 0; j < Node->Edges[i]->Nodes.size(); j++)
+            {
+                std::cout<<Node->Edges[i]->Nodes[j]->data<<std::endl;
+            }
+        }
+    }
     
-    root->children.push_back(new_standard_tree_node(2));
-    root->children.push_back(new_standard_tree_node(3));
-    
-    root->children.front()->children.push_back(new_standard_tree_node(4));
-    root->children.front()->children.push_back(new_standard_tree_node(5));
-    root->children.front()->children.push_back(new_standard_tree_node(6));
-    root->children.back()->children.push_back(new_standard_tree_node(7));
-    root->children.back()->children.push_back(new_standard_tree_node(8));
-    
-    root->children.front()->children.front()->children.push_back(new_standard_tree_node(10));
-    root->children.front()->children[1]->children.push_back(new_standard_tree_node(11));
-    root->children.back()->children.front()->children.push_back(new_standard_tree_node(12));
-    
-    //auto it = std::find(root->children.front()->children.begin(), root->children.front()->children.end(), 2); // ser etter en verdi som matcher 2 og ikke plass 2
-    
-    print_standard_tree(root);
-    
-    return 0;
-}
-
+};
