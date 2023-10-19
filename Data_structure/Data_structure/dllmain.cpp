@@ -178,7 +178,8 @@ class Standard_Tree_Node
 {
 public:
     int data;
-    std::list<Standard_Tree_Node*>children;
+    //std::list<Standard_Tree_Node*>children;
+    std::vector<Standard_Tree_Node*> children;
 };
 
 /// \brief Create new standard tree node
@@ -202,7 +203,7 @@ int get_sum_of_standard_tree(Standard_Tree_Node* root)
     {
         sum += get_sum_of_standard_tree(root->children.front());
         root->children.push_back(root->children.front());
-        root->children.pop_front();
+        root->children.erase(root->children.begin());
     }
     return sum;
 }
@@ -217,7 +218,7 @@ void print_standard_tree(Standard_Tree_Node* root)
     {
         print_standard_tree(root->children.front());
         root->children.push_back(root->children.front());
-        root->children.pop_front();
+        root->children.erase(root->children.begin());
     }
 }
 
@@ -233,16 +234,24 @@ int main()
     //
     // std::cout<<root->left->data<<std::endl;
     // std::cout<<get_sum_of(root->left) <<std::endl;
-
+    //
     Standard_Tree_Node* root = new_standard_tree_node(1);
+    
     root->children.push_back(new_standard_tree_node(2));
     root->children.push_back(new_standard_tree_node(3));
+    
     root->children.front()->children.push_back(new_standard_tree_node(4));
     root->children.front()->children.push_back(new_standard_tree_node(5));
-    root->children[2]->children.push_back(new_standard_tree_node(6));
-    root->children.front()->children.front()->children.push_back(new_standard_tree_node(6));
+    root->children.front()->children.push_back(new_standard_tree_node(6));
+    root->children.back()->children.push_back(new_standard_tree_node(7));
+    root->children.back()->children.push_back(new_standard_tree_node(8));
     
-
+    root->children.front()->children.front()->children.push_back(new_standard_tree_node(10));
+    root->children.front()->children[1]->children.push_back(new_standard_tree_node(11));
+    root->children.back()->children.front()->children.push_back(new_standard_tree_node(12));
+    
+    //auto it = std::find(root->children.front()->children.begin(), root->children.front()->children.end(), 2); // ser etter en verdi som matcher 2 og ikke plass 2
+    
     print_standard_tree(root);
     
     return 0;
