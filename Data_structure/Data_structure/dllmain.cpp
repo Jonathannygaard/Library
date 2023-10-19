@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <list>
 
 
 std::vector<int> Vector;
@@ -153,7 +154,7 @@ class B_Tree_Node
     B_Tree_Node* right;
 };
 
-B_Tree_Node* newNode(int data)
+B_Tree_Node* new_B_Tree_Node(int data)
 {
     //Here we have a function that creates a new node that will be used in main to create "branches" of the tree
     B_Tree_Node* node = new B_Tree_Node();
@@ -172,18 +173,78 @@ int get_sum_of(B_Tree_Node* root)
     return root->data + get_sum_of(root->left) + get_sum_of(root->right);
 }
 
+/// \brief Standard tree node class
+class Standard_Tree_Node
+{
+public:
+    int data;
+    std::list<Standard_Tree_Node*>children;
+};
+
+/// \brief Create new standard tree node
+/// \param data Data of the node
+Standard_Tree_Node* new_standard_tree_node(int data)
+{
+    Standard_Tree_Node* node = new Standard_Tree_Node();
+    node->data = data;
+    return node;
+}
+
+/// \brief Get sum of standard tree
+/// \param root Root of the tree
+int get_sum_of_standard_tree(Standard_Tree_Node* root)
+{
+    if(root == NULL)
+        return 0;
+
+    int sum = root->data;
+    for(int i = 0; i < root->children.size(); i++)
+    {
+        sum += get_sum_of_standard_tree(root->children.front());
+        root->children.push_back(root->children.front());
+        root->children.pop_front();
+    }
+    return sum;
+}
+
+void print_standard_tree(Standard_Tree_Node* root)
+{
+    if(root == NULL)
+        return;
+
+    std::cout<<root->data<<std::endl;
+    for(int i = 0; i < root->children.size(); i++)
+    {
+        print_standard_tree(root->children.front());
+        root->children.push_back(root->children.front());
+        root->children.pop_front();
+    }
+}
+
 int main()
 {
 
-    B_Tree_Node* root = newNode(1);
-    root->left = newNode(2);
-    root->right = newNode(3);
-    root->left->left  = newNode(15);
-    root->left->right = newNode(25);
-    root->left = newNode(7);
+    // B_Tree_Node* root = new_B_Tree_Node(1);
+    // root->left = new_B_Tree_Node(2);
+    // root->right = new_B_Tree_Node(3);
+    // root->left->left  = new_B_Tree_Node(15);
+    // root->left->right = new_B_Tree_Node(25);
+    // root->left = new_B_Tree_Node(7);
+    //
+    // std::cout<<root->left->data<<std::endl;
+    // std::cout<<get_sum_of(root->left) <<std::endl;
 
-    std::cout<<root->left->data<<std::endl;
-    std::cout<<get_sum_of(root->left) <<std::endl;
+    Standard_Tree_Node* root = new_standard_tree_node(1);
+    root->children.push_back(new_standard_tree_node(2));
+    root->children.push_back(new_standard_tree_node(3));
+    root->children.front()->children.push_back(new_standard_tree_node(4));
+    root->children.front()->children.push_back(new_standard_tree_node(5));
+    root->children[2]->children.push_back(new_standard_tree_node(6));
+    root->children.front()->children.front()->children.push_back(new_standard_tree_node(6));
+    
+
+    print_standard_tree(root);
     
     return 0;
 }
+
