@@ -250,19 +250,93 @@ public:
        std::cout<<node->Parent->data<<std::endl;
    }
 
-    static void find_children(Standard_Tree_Node* node)
+    /// \brief Finding all direct children of node
+    /// \param node Node to find children of
+    static int find_children(Standard_Tree_Node* node)
    {
        if (node->children.size() == 0)
        {
            std::cout<<"Node is leaf"<<std::endl;
-           return;
+           return 0;
        }
        for (Standard_Tree_Node* i: node->children)
        {
            std::cout<<"Printing data from all children"<<std::endl;
            std::cout<<i->data<<std::endl;
        }
-   }    
+       return 1;
+   }
+
+    /// \brief Check if node is leaf
+    /// \param node Node to check
+    static bool is_Leaf(Standard_Tree_Node* node)
+   {
+       if(find_children(node) == 0)
+       {
+           return true;
+       }
+       else
+       {
+           std::cout << "Node is not leaf" << std::endl;
+           std::cout << "All children printed above" << std::endl;
+           return false;
+       }
+   }
+
+    /// \brief Check if node is root
+    /// \param node Node to check
+    static bool is_Root(Standard_Tree_Node* node)
+   {
+       if(node->Parent == NULL)
+       {
+           return true;
+       }
+       return false;
+   }
+
+    /// \brief Find root of tree
+    /// \param node Node to start from
+   static Standard_Tree_Node* find_root(Standard_Tree_Node* node)
+    {
+        if(node->Parent == NULL)
+        {
+            return node;
+        }
+        find_root(node->Parent);
+        return node;
+    }
+
+    static void find_Depth_of_Node(Standard_Tree_Node* node)
+   {
+       int Depth = 0;
+       while(node->Parent != NULL)
+       {
+           Depth++;
+           node = node->Parent;
+       }
+       std::cout << "Depth of node is: " << Depth << std::endl;
+   }
+
+    static void find_Depth_of_Tree(Standard_Tree_Node* node)
+   {
+       int Depth = 0;
+       int Max_Depth = 0;
+       Standard_Tree_Node* temp_node;
+       if(node->children.empty())
+       {
+           if(Depth > Max_Depth)
+           {
+               Max_Depth = Depth;
+           }
+           temp_node = node->children.front();
+           node->children.erase(node->children.begin());
+           node->children.push_back(temp_node);
+       }
+       
+       Depth++;
+       find_Depth_of_Tree(temp_node);
+       std::cout << "Depth of tree is: " << Max_Depth << std::endl;
+   }
 };
 
 
