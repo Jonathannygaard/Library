@@ -186,7 +186,6 @@ class Standard_Tree_Node
 {
 public:
     int data;
-    //std::list<Standard_Tree_Node*>children;
     std::vector<Standard_Tree_Node*> children;
     Standard_Tree_Node* Parent;
 };
@@ -202,6 +201,7 @@ public:
         node->data = data;
         node->Parent = Parent;
         return node;
+        
     }
 
     /// \brief Get sum of standard tree
@@ -254,7 +254,7 @@ public:
    {
        if (node->children.size() == 0)
        {
-           std::cout<<"Node has no children"<<std::endl;
+           std::cout<<"Node is leaf"<<std::endl;
            return;
        }
        for (Standard_Tree_Node* i: node->children)
@@ -262,8 +262,7 @@ public:
            std::cout<<"Printing data from all children"<<std::endl;
            std::cout<<i->data<<std::endl;
        }
-   }
-    
+   }    
 };
 
 
@@ -331,5 +330,4 @@ public:
             }
         }
     }
-    
 };
