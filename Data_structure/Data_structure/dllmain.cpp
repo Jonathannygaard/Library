@@ -327,9 +327,9 @@ public:
    {
        finding_Depth_of_Tree(node);
        std::cout << "Depth of tree is: " << Max_Depth << std::endl;
-       std::cout << "why this rund so many times" << std::endl;
+       std::cout << "Bullshit" << std::endl;
    }
-    
+private:
     void finding_Depth_of_Tree(Standard_Tree_Node* node)
    {
        if(node->children.empty())
@@ -338,7 +338,6 @@ public:
            {
                Max_Depth = Depth;
            }
-           Depth = 0;
        }
        else
        {
@@ -348,6 +347,7 @@ public:
                temp_node = child;
                finding_Depth_of_Tree(temp_node);
            }
+           Depth--;
        }
        
    }
