@@ -193,6 +193,12 @@ public:
 class Standard_Tree
 {
 public:
+
+    int Depth = 0;
+    int Max_Depth = 0;
+    Standard_Tree_Node* root;
+    Standard_Tree_Node* temp_node;
+    
     /// \brief Create new standard tree node
     /// \param data Data of the node
    static Standard_Tree_Node* new_standard_tree_node(int data, Standard_Tree_Node* Parent)
@@ -317,25 +323,33 @@ public:
        std::cout << "Depth of node is: " << Depth << std::endl;
    }
 
-    static void find_Depth_of_Tree(Standard_Tree_Node* node)
+    void find_Depth_of_Tree(Standard_Tree_Node* node)
    {
-       int Depth = 0;
-       int Max_Depth = 0;
-       Standard_Tree_Node* temp_node;
+       finding_Depth_of_Tree(node);
+       std::cout << "Depth of tree is: " << Max_Depth << std::endl;
+       std::cout << "why this rund so many times" << std::endl;
+   }
+    
+    void finding_Depth_of_Tree(Standard_Tree_Node* node)
+   {
        if(node->children.empty())
        {
            if(Depth > Max_Depth)
            {
                Max_Depth = Depth;
            }
-           temp_node = node->children.front();
-           node->children.erase(node->children.begin());
-           node->children.push_back(temp_node);
+           Depth = 0;
+       }
+       else
+       {
+           Depth++;
+           for(auto child: node->children)
+           {
+               temp_node = child;
+               finding_Depth_of_Tree(temp_node);
+           }
        }
        
-       Depth++;
-       find_Depth_of_Tree(temp_node);
-       std::cout << "Depth of tree is: " << Max_Depth << std::endl;
    }
 };
 
