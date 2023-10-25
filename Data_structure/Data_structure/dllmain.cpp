@@ -196,19 +196,37 @@ public:
 
     int Depth = 0;
     int Max_Depth = 0;
+    int Size = 0;
     Standard_Tree_Node* root;
     Standard_Tree_Node* temp_node;
+    std::vector<Standard_Tree_Node*> Node_List;
+
     
     /// \brief Create new standard tree node
     /// \param data Data of the node
-   static Standard_Tree_Node* new_standard_tree_node(int data, Standard_Tree_Node* Parent)
-    {
-        Standard_Tree_Node* node = new Standard_Tree_Node();
-        node->data = data;
-        node->Parent = Parent;
-        return node;
-        
+       Standard_Tree_Node* new_standard_tree_node(int data, Standard_Tree_Node* Parent)
+        {
+            Standard_Tree_Node* node = new Standard_Tree_Node();
+            node->data = data;
+            node->Parent = Parent;
+            Node_List.push_back(node);
+            if (Parent != NULL)
+                Parent->children.push_back(node);
+            return node;
+            
     }
+    /// \brief Find random node
+    Standard_Tree_Node* find_random_node()
+    {
+           return Node_List[rand() % Node_List.size()-1];;
+    }
+    
+    Standard_Tree_Node* create_node_randomly(int data)
+    {
+           return new_standard_tree_node(data, find_random_node());
+    }
+
+   
 
     /// \brief Get sum of standard tree
     /// \param root Root of the tree
@@ -281,12 +299,9 @@ public:
        {
            return true;
        }
-       else
-       {
-           std::cout << "Node is not leaf" << std::endl;
-           std::cout << "All children printed above" << std::endl;
-           return false;
-       }
+       std::cout << "Node is not leaf" << std::endl;
+       std::cout << "All children printed above" << std::endl;
+       return false;
    }
 
     /// \brief Check if node is root
@@ -312,6 +327,8 @@ public:
         return node;
     }
 
+    /// \brief Find depth of node
+    /// \param node Node to find depth of
     static void find_Depth_of_Node(Standard_Tree_Node* node)
    {
        int Depth = 0;
@@ -323,12 +340,20 @@ public:
        std::cout << "Depth of node is: " << Depth << std::endl;
    }
 
+    /// \brief Finding max depth of tree
+    /// \param node Node to start from
     void find_Depth_of_Tree(Standard_Tree_Node* node)
    {
        finding_Depth_of_Tree(node);
        std::cout << "Depth of tree is: " << Max_Depth << std::endl;
-       std::cout << "Bullshit" << std::endl;
    }
+
+    /// \bried Find total size of tree
+    void find_size() 
+    {
+       Size = Node_List.size();
+       std::cout << "Size of tree is: " << Size << std::endl;
+    }
 private:
     void finding_Depth_of_Tree(Standard_Tree_Node* node)
    {
@@ -358,64 +383,79 @@ class Graph_Node
 {
 public:
     int data;
-    std::vector<Edge_Node*> Edges; 
+    std::vector<Edge_Node*> Edges;
+    std::vector<Graph_Node*> Adjacent_Nodes;
 };
 class Edge_Node
 {
 public:
-    int data;
+    int Weight;
     std::vector<Graph_Node*> Nodes;
 };
 
 class Graph
 {
 public:
-   static Graph_Node* new_graph_node(int data, std::vector<Edge_Node*> Edges)
+    std::vector<Graph_Node*> All_Nodes;
+    std::vector<Edge_Node*> All_Edges;
+    Graph_Node* root;
+    
+   Graph_Node* new_graph_node(int data, std::vector<Edge_Node*> Edges)
     {
         Graph_Node* node = new Graph_Node();
+        All_Nodes.push_back(node);
         node->data = data;
         node->Edges = Edges;
         return node;
     }
-    static Edge_Node* new_edge_node(int data, std::vector<Graph_Node*> Nodes)
+    Edge_Node* new_edge_node(int Weight, std::vector<Graph_Node*> Nodes)
     {
         Edge_Node* node = new Edge_Node();
-        node->data = data;
+        All_Edges.push_back(node);
+        node->Weight = Weight;
         node->Nodes = Nodes;
         return node;
     }
-    static void add_connection(Graph_Node* Node, Edge_Node* Edge)
+    void connect_nodes(Graph_Node* Node, Graph_Node* Node2, int Weight)
+   {
+       std::vector<Graph_Node*> Nodes;
+         Nodes.push_back(Node);
+         Nodes.push_back(Node2);
+       Edge_Node* Edge = new_edge_node(Weight, Nodes);
+       Node->Adjacent_Nodes.push_back(Node2);
+       Node2->Adjacent_Nodes.push_back(Node);
+       Node->Edges.push_back(Edge);
+       Node2->Edges.push_back(Edge);
+   }
+    void remove_connection(Graph_Node* Node, Graph_Node* Node2)
     {
-        Node->Edges.push_back(Edge);
-        Edge->Nodes.push_back(Node);
+       std::vector<Graph_Node*> temp_node_vector;
+       temp_node_vector.push_back(Node);
+       temp_node_vector.push_back(Node2);
+       for (auto Edge : Node->Edges)
+       {
+           Edge->Nodes = temp_node_vector;
+       }
+        for(int i = 0; i < Node->Adjacent_Nodes.size(); i++)
+        {
+            if(Node->Adjacent_Nodes[i] == Node2)
+            {
+                Node->Adjacent_Nodes.erase(Node->Adjacent_Nodes.begin() + i);
+            }
+        }
+        for(int i = 0; i < Node2->Adjacent_Nodes.size(); i++)
+        {
+            if(Node2->Adjacent_Nodes[i] == Node)
+            {
+                Node2->Adjacent_Nodes.erase(Node2->Adjacent_Nodes.begin() + i);
+            }
+        }
     }
-    static void remove_connection(Graph_Node* Node, Edge_Node* Edge)
+    void print_graph(Graph_Node* root)
     {
-        for(int i = 0; i < Node->Edges.size(); i++)
-        {
-            if(Node->Edges[i] == Edge)
-            {
-                Node->Edges.erase(Node->Edges.begin() + i);
-            }
-        }
-        for(int i = 0; i < Edge->Nodes.size(); i++)
-        {
-            if(Edge->Nodes[i] == Node)
-            {
-                Edge->Nodes.erase(Edge->Nodes.begin() + i);
-            }
-        }
-    }
-    static void print_graph(Graph_Node* Node)
-    {
-        std::cout<<Node->data<<std::endl;
-        for(int i = 0; i < Node->Edges.size(); i++)
-        {
-            std::cout<<Node->Edges[i]->data<<std::endl;
-            for(int j = 0; j < Node->Edges[i]->Nodes.size(); j++)
-            {
-                std::cout<<Node->Edges[i]->Nodes[j]->data<<std::endl;
-            }
-        }
+       for (auto Node : All_Nodes)
+       {
+           std::cout << Node->data << std::endl;
+       }
     }
 };
