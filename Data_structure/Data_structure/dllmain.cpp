@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <list>
+#include <stdbool.h>
+#include <stdbool.h>
 
 
 class Edge_Node;
@@ -196,7 +198,6 @@ public:
 
     int Depth = 0;
     int Max_Depth = 0;
-    int Size = 0;
     Standard_Tree_Node* root;
     Standard_Tree_Node* temp_node;
     std::vector<Standard_Tree_Node*> Node_List;
@@ -351,8 +352,7 @@ public:
     /// \bried Find total size of tree
     void find_size() 
     {
-       Size = Node_List.size();
-       std::cout << "Size of tree is: " << Size << std::endl;
+       std::cout << "Size of tree is: " << Node_List.size() << std::endl;
     }
 private:
     void finding_Depth_of_Tree(Standard_Tree_Node* node)
@@ -385,12 +385,14 @@ public:
     int data;
     std::vector<Edge_Node*> Edges;
     std::vector<Graph_Node*> Adjacent_Nodes;
+    bool Visited = false;
 };
 class Edge_Node
 {
 public:
     int Weight;
     std::vector<Graph_Node*> Nodes;
+    bool Visited = false;
 };
 
 class Graph
@@ -399,63 +401,193 @@ public:
     std::vector<Graph_Node*> All_Nodes;
     std::vector<Edge_Node*> All_Edges;
     Graph_Node* root;
-    
-   Graph_Node* new_graph_node(int data, std::vector<Edge_Node*> Edges)
+
+    /// \brief Creating a new graph node
+    /// \param data Information to be stored in node (int)
+   Graph_Node* new_graph_node(int data)
     {
         Graph_Node* node = new Graph_Node();
         All_Nodes.push_back(node);
         node->data = data;
-        node->Edges = Edges;
         return node;
     }
-    Edge_Node* new_edge_node(int Weight, std::vector<Graph_Node*> Nodes)
+
+    /// \brief Creating a new edge
+    /// \param Weight Weight of node (int)
+    Edge_Node* new_edge_node(int Weight)
     {
         Edge_Node* node = new Edge_Node();
         All_Edges.push_back(node);
         node->Weight = Weight;
-        node->Nodes = Nodes;
         return node;
     }
+
+    /// \brief Connecting two node and creating an edge between them
+    /// \param Node First node to connect
+    /// \param Node2 Second node to connect
+    /// \param Weight Weight of Edge
     void connect_nodes(Graph_Node* Node, Graph_Node* Node2, int Weight)
    {
        std::vector<Graph_Node*> Nodes;
          Nodes.push_back(Node);
          Nodes.push_back(Node2);
-       Edge_Node* Edge = new_edge_node(Weight, Nodes);
+       Edge_Node* Edge = new_edge_node(Weight);
+       Edge->Nodes = Nodes;
        Node->Adjacent_Nodes.push_back(Node2);
        Node2->Adjacent_Nodes.push_back(Node);
        Node->Edges.push_back(Edge);
        Node2->Edges.push_back(Edge);
    }
+
+    /// \brief Removing connection between two nodes
+    /// \param Node First node to remove connection from
+    /// \param Node2 Second node to remove connection from
     void remove_connection(Graph_Node* Node, Graph_Node* Node2)
+   {
+         for (auto Edge : Node->Edges)
+         {
+              for (auto check_Node: Edge->Nodes)
+              {
+                  if(check_Node != Node2)
+                  {
+                      continue;
+                  }
+                  for (auto Node: Edge->Nodes)
+                  {
+                      Edge->Nodes.erase(Edge->Nodes.begin());
+                  }
+              }
+         }
+          for(int i = 0; i < Node->Adjacent_Nodes.size()-1; i++)
+          {
+                if(Node->Adjacent_Nodes[i] == Node2)
+                {
+                 Node->Adjacent_Nodes.erase(Node->Adjacent_Nodes.begin() + i);
+                }
+          }
+          for(int i = 0; i < Node2->Adjacent_Nodes.size()-1; i++)
+          {
+                if(Node2->Adjacent_Nodes[i] == Node)
+                {
+                 Node2->Adjacent_Nodes.erase(Node2->Adjacent_Nodes.begin() + i);
+                }
+          }
+     }
+    
+     /// \brief Finding all nodes connected to a node
+     /// \param Node Node to find adjacent nodes of
+     void find_adjacent_nodes(Graph_Node* Node)
     {
-       std::vector<Graph_Node*> temp_node_vector;
-       temp_node_vector.push_back(Node);
-       temp_node_vector.push_back(Node2);
-       for (auto Edge : Node->Edges)
-       {
-           Edge->Nodes = temp_node_vector;
-       }
-        for(int i = 0; i < Node->Adjacent_Nodes.size(); i++)
-        {
-            if(Node->Adjacent_Nodes[i] == Node2)
-            {
-                Node->Adjacent_Nodes.erase(Node->Adjacent_Nodes.begin() + i);
-            }
-        }
-        for(int i = 0; i < Node2->Adjacent_Nodes.size(); i++)
-        {
-            if(Node2->Adjacent_Nodes[i] == Node)
-            {
-                Node2->Adjacent_Nodes.erase(Node2->Adjacent_Nodes.begin() + i);
-            }
-        }
+         for (auto node: Node->Adjacent_Nodes)
+         {
+              std::cout<<node->data<<std::endl;
+         }
     }
+    
+     /// \brief Finding all edges connected to a node
+     /// \param Node Node to find edges of
+     void find_edges(Graph_Node* Node)
+    {
+         for (auto edge: Node->Edges)
+         {
+              std::cout<<edge->Weight<<std::endl;
+         }
+   }
+
+    /// \brief Counting all nodes in graph
+    /// \param Graph Graph to find nodes of
+    int find_size(Graph* Graph)
+    {
+        return Graph->All_Nodes.size();
+    }
+
+    /// \brief Counting all edges in graph
+    /// \param Graph Graph to find edges of
+    int find_size_of_edges(Graph* Graph)
+    {
+        return Graph->All_Edges.size();
+    }
+
+    /// \brief Finding amount of adjacent nodes of node
+    /// \param Node Node to find adjacent nodes of
+    int find_amount_of_adjacent_nodes(Graph_Node* Node)
+    {
+        return Node->Adjacent_Nodes.size();
+    }
+
+    /// \brief Finding amount of edges of node
+    /// \param Node Node to find edges of
+    int find_amount_of_edges_of_node(Graph_Node* Node)
+    {
+        return Node->Edges.size();
+    }
+
+    /// \brief Finding data of node
+    /// \param Node Node to find data of
+    int find_data_of_node(Graph_Node* Node)
+   {
+       return Node->data;
+   }
+
+    int find_weight_of_edge(Edge_Node* Edge)
+   {
+       return Edge->Weight;
+   }
+    
+
+    /// \brief Printing all nodes using depth first search
+    /// \param root Node to start printing from
     void print_graph(Graph_Node* root)
     {
-       for (auto Node : All_Nodes)
+       bool to_continue = false;
+       int temp_visited_check = 0;
+       for (auto node: All_Nodes)
        {
-           std::cout << Node->data << std::endl;
+           if(node->Visited== true)
+           {
+               temp_visited_check++;
+           }
+       }
+       if(temp_visited_check == All_Nodes.size())
+       {
+        return;
+       }
+       for(auto edge: root->Edges)
+       {
+           if(edge->Visited == true)
+           {
+               continue;
+           }
+           for (auto node: edge->Nodes)
+           {
+               if(node == root)
+               {
+                   continue;
+               }
+               if(node->Visited == true)
+               {
+                   to_continue = true;
+               }
+           }
+           if(to_continue == true)
+           {
+               continue;
+           }
+           for(auto node: edge->Nodes)
+           {
+               if(node == root)
+               {
+                   continue;
+               }
+               std::cout<<root->data;
+               root->Visited = true;
+               std::cout << "----" << edge->Weight << "----";
+               edge->Visited = true;
+               std::cout<<node->data<<std::endl;
+               node->Visited = true;
+               
+               print_graph(node);
+           }
        }
     }
 };
