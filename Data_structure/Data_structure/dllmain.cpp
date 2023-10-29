@@ -65,7 +65,7 @@ static void quicksort(std::vector<int> &vec, int L, int R)
         while (vec[j] > piv)
             j--;
 
-        if (i <= j) {
+        if (i <= j){
             swap(vec, i, j);
             i++;
             j--;
