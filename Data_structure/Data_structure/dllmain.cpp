@@ -386,6 +386,7 @@ public:
     std::vector<Edge_Node*> Edges;
     std::vector<Graph_Node*> Adjacent_Nodes;
     bool Visited = false;
+    int Distance = 0;
 };
 class Edge_Node
 {
@@ -400,6 +401,7 @@ class Graph
 public:
     std::vector<Graph_Node*> All_Nodes;
     std::vector<Edge_Node*> All_Edges;
+    std::vector<Graph_Node*> Visited_Nodes;
     Graph_Node* root;
     Edge_Node* temp_edge;
 
@@ -633,4 +635,57 @@ public:
            }
        }
     }
+
+    void Dijkstra (Graph_Node* Node)
+   {       
+       Visited_Nodes.push_back(Node);
+       int temp_weight = NULL;
+       int temp_distance = Node->Distance;
+       
+       std::cout<<Node->data<<std::endl;
+       std::cout<<Node->Distance<<std::endl;
+       
+       for (auto edge: Node->Edges)
+       {
+           if(temp_weight == NULL)
+           {
+               temp_weight = edge->Weight;
+           }
+           else if (edge->Weight < temp_weight)
+           {
+               temp_weight = edge->Weight;
+           }
+       }
+         for (auto edge: Node->Edges)
+         {
+             bool temp_visited = false;
+              if(edge->Weight != temp_weight)
+              {
+                  continue;
+              }
+             for (auto node: edge->Nodes)
+                {
+                     if(Node == node)
+                     {
+                          continue;
+                     }
+                 for (auto visited_node: Visited_Nodes)
+                 {
+                     if(visited_node == node)
+                     {
+                         temp_visited = true;
+                         break;
+                     }
+                 }
+                    if(temp_visited == true)
+                    {
+                        continue;
+                    }
+                    node->Distance += edge->Weight;
+                    temp_distance += node->Distance;
+                    Dijkstra(node);
+                }
+             
+         }
+   }
 };
