@@ -1,9 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <list>
-#include <stdbool.h>
-#include <stdbool.h>
-
+#include <queue>
+#include <unordered_map> 
 
 class Edge_Node;
 class Graph_Node;
@@ -378,7 +377,19 @@ private:
    }
 };
 
+struct QueueNode
+{
+    Graph_Node* node;
+    double priority;
 
+    QueueNode (Graph_Node* Node, double Priority) : node(Node), priority(Priority){}
+
+    bool operator<(const QueueNode& rhs) const
+    {
+        return priority > rhs.priority;
+    }
+ 
+};
 class Graph_Node
 {
 public:
@@ -635,57 +646,87 @@ public:
            }
        }
     }
+    static void Dijkstra (Graph_Node* Start)
+   {
+       std::cout << "Dijstra algorythm to find shortest path to every node:" << std::endl;
+           std::priority_queue<QueueNode> queue;
+           std::unordered_map<Graph_Node*, float> costsofar;
+           std::unordered_map<Graph_Node*, Graph_Node*> camefrom;
 
-    void Dijkstra (Graph_Node* Node)
-   {       
-       Visited_Nodes.push_back(Node);
-       int temp_weight = NULL;
-       int temp_distance = Node->Distance;
-       
-       std::cout<<Node->data<<std::endl;
-       std::cout<<Node->Distance<<std::endl;
-       
-       for (auto edge: Node->Edges)
-       {
-           if(temp_weight == NULL)
+           queue.push(QueueNode(Start, 0));
+           costsofar[Start] = 0;
+           camefrom[Start] = Start;
+
+           while (!queue.empty())
            {
-               temp_weight = edge->Weight;
+               Graph_Node* current = queue.top().node;
+               queue.pop();
+
+               for (Edge_Node* edge : current->Edges)
+               {
+                   for (Graph_Node* next : edge->Nodes)
+                   {
+                       if(next == current) continue;
+                       double newcost = costsofar[current] + edge->Weight;
+                       if(!costsofar.count(next) || newcost < costsofar[next])
+                       {
+                           costsofar[next] = newcost;
+                           double priority = newcost;
+                           queue.push(QueueNode(next, priority));
+                           camefrom[next] = current;
+                       }
+                   }
+               }
+               std::cout <<"Data:" << current->data << "<- Cost:" << costsofar[current] << std::endl;
            }
-           else if (edge->Weight < temp_weight)
+   }
+
+static void AStar (Graph_Node* Start, Graph_Node* End, std::unordered_map<Graph_Node*, float> Hermap)
+   {
+       std::cout << "AStar algorythm to find shortest path to end node:" << std::endl;
+       std::priority_queue<QueueNode> queue;
+       std::unordered_map<Graph_Node*, float> costsofar;
+       std::unordered_map<Graph_Node*, Graph_Node*> camefrom;
+
+       queue.push(QueueNode(Start, 0));
+       costsofar[Start] = 0;
+       camefrom[Start] = Start;
+
+       while (!queue.empty())
+       {
+           Graph_Node* current = queue.top().node;
+           queue.pop();
+
+           if(current == End)
            {
-               temp_weight = edge->Weight;
+               break;
+           }
+
+           for (Edge_Node* edge : current->Edges)
+           {
+               for (Graph_Node* next : edge->Nodes)
+               {
+                   if(next == current) continue;
+                   double newcost = costsofar[current] + edge->Weight;
+                   if(!costsofar.count(next) || newcost < costsofar[next])
+                   {
+                       costsofar[next] = newcost;
+                       double priority = newcost + Hermap[next];
+                       queue.push(QueueNode(next, priority));
+                       camefrom[next] = current;
+                   }
+               }
            }
        }
-         for (auto edge: Node->Edges)
-         {
-             bool temp_visited = false;
-              if(edge->Weight != temp_weight)
-              {
-                  continue;
-              }
-             for (auto node: edge->Nodes)
-                {
-                     if(Node == node)
-                     {
-                          continue;
-                     }
-                 for (auto visited_node: Visited_Nodes)
-                 {
-                     if(visited_node == node)
-                     {
-                         temp_visited = true;
-                         break;
-                     }
-                 }
-                    if(temp_visited == true)
-                    {
-                        continue;
-                    }
-                    node->Distance += edge->Weight;
-                    temp_distance += node->Distance;
-                    Dijkstra(node);
-                }
-             
-         }
+
+       Graph_Node* current = End;
+       while (current != Start)
+       {
+           std::cout <<"    Data: " << current->data << " Cost: " << costsofar[current] << " <--- ";
+           current = camefrom[current];
+       }
+       std::cout <<"Data: " << Start->data << " <- Cost: " << costsofar[Start] << std::endl;
    }
+
+    
 };
