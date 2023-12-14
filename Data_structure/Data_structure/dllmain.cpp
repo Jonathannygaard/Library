@@ -246,21 +246,21 @@ public:
     }
 
 
-    /// \brief Print standard tree
-    /// \param root node used as root in print
-    static void print_standard_tree(Standard_Tree_Node* root)
-    {
-        if(root == NULL)
-            return;
-
-        std::cout<<root->data<<std::endl;
-        for(int i = 0; i < root->children.size(); i++)
+        /// \brief Print standard tree
+        /// \param root node used as root in print
+        static void print_standard_tree(Standard_Tree_Node* root)
         {
-            print_standard_tree(root->children.front());
-            root->children.push_back(root->children.front());
-            root->children.erase(root->children.begin());
+            if(root == NULL)
+                return;
+
+            std::cout<<root->data<<std::endl;
+            for(int i = 0; i < root->children.size(); i++)
+            {
+                print_standard_tree(root->children.front());
+                root->children.push_back(root->children.front());
+                root->children.erase(root->children.begin());
+            }
         }
-    }
 
     /// \brief Find parent of node
     /// \param node Node to find parent of
